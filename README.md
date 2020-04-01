@@ -25,7 +25,7 @@ The advantage is: add rat(j) for intermediate j as additional terms for our obje
 
      regularized_loss := total_loss + alpha * sum_{j = 2,...,n-1} w(j) rat(j)
 
-where w(j) is just a normalization term such as w(j) := (d(j) - 1) / ((k - 1) sum_{a = 2,..,n-1; w(a) = w(j)}).  This normalization picked so each node in a layer has the same weight and the early layers, near the explanatory/input variables, get weaker regularization.
+where w(j) is just a normalization term such as w(j) := (d(j) - 1) / ((k - 1) sum_{a = 2,..,n-1; w(a) = w(j)}).  This normalization picked so each node in a layer has the same weight and the early layers, near the explanatory/input variables, get weaker regularization.  alpha is a hyper-parameter specifying the strength of the regularization.
 
 The overall idea: later layers in the neural net should have unsurprising values given the training outcome.  So we are adding a simple norm, one of many possible, to try and enforce that.  Or: to reduce over-fit try to minimize non-explanatory variation in the network activations.
 
