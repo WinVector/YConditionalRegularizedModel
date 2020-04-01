@@ -3,9 +3,9 @@ Win Vector LLC's Dr. Nina Zumel has had great success applying [y-aware methods]
 
 This is an example of regularizing a neural net by its activations (values seen at nodes), conditioned on outcome.
 
-The idea is: for a binary classification neural net we ideally want at the very last layer the prediction is 1 when the training outcome is 1 and the prediction is 0 when the training outcome is 0.  Our improvement is to generalize this training criteria in such a way that it can be applied to interior layers of the neural net as follows.
+The idea is: at the last layer of a binary classification neural net we ideally want that the prediction is 1 when the training outcome is 1 and that the prediction is 0 when the training outcome is 0.  Our improvement is to generalize this training criteria in such a way that it can be applied to interior layers of the neural net as follows.
 
-Suppose our training examples are indexed by i for i = 1,...,m and our neural net nodes are labeled by j = 1,...,n.  y(i) is the training outcome which we are assuming is 0/1. d(j) is the depth of the layer the j-th node is in, which ranges from 1 to k, 1 being the input layer (explanatory variables) and k being the output layer.  Define a(j, i) as the activation or value seen at node j (the value after the node's transfer and activation) for training example i.  Assume a(n, i) is the output or prediction layer of the neural net.  a(j, i) varies as the neural net weights are updated during training, we are looking at a(j, i) for a given value of the weights, and will need to re-compute a(j, i) after any training step or weight update.
+Suppose our training examples are indexed by i for i = 1,...,m and our neural net nodes are labeled by j = 1,...,n.  y(i) is the training outcome which we are assuming is 0/1. d(j) is the depth of the layer the j-th node is in, which ranges from 1 to k.  Depth 1 denotes the input layer (explanatory variables) and depth k is the output layer. We will assume, without loss of generality, that the node with j=n is the unique node of depth k; i.e. it is the output or prediction. Define a(j, i) as the activation or value seen at node j (the value after the node's transfer and activation) for training example i.  We have assumed that a(n, i) is the output or prediction layer of the neural net.  a(j, i) varies as the neural net weights are updated during training, we are looking at a(j, i) for a given value of the weights, and will need to re-compute a(j, i) after any training step or weight update.
 
 We can generalize the empirical "match the outputs condition" to the following.  For node-j define the y-conditioned variance as:
 
@@ -14,7 +14,7 @@ We can generalize the empirical "match the outputs condition" to the following. 
      var(j, i)  := (a(j, i) - mean(i, j, y(i)))^2
      rat(j, i)  := var(j) / cross(j) 
 
-The intent is rat(j, i) should look a lot like a supervised version of the Calinski and Harabasz variance ratio criterion.  A small value of rat(j, i) can be taken to mean that, for a given j, most of the variation in a(j, i) is associated with variation in y(i). mean(j, 0), mean(j, 1), and cross(j) are all many-example aggregates, for simplicity we will estimate them per-batch and thus prefer large batch sizes for better estimates.
+The intent is rat(j, i) should look a lot like a supervised version of the [Calinski and Harabasz variance ratio criterion](https://www.tandfonline.com/doi/abs/10.1080/03610927408827101).  A small value of rat(j, i) can be taken to mean that, for a given j, most of the variation in a(j, i) is associated with variation in y(i). mean(j, 0), mean(j, 1), and cross(j) are all many-example aggregates, for simplicity we will estimate them per-batch and thus prefer large batch sizes for better estimates.
 
 A typical objective function for a binary classification problem is to minimize the following cross-entropy.
 
@@ -37,7 +37,7 @@ In this project we demonstrate the effect on a simple data set using Keras and T
   * We include the dependent or outcome variable y(i) in our neural net input.
   * We build a layer called [TrimmingLayer](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/TrimmingLayer.py) that strips out the y(i) and sends the rest of the inputs for normal processing.
   * We build a special layer called [ScoringLayer](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/ScoringLayer.py) that collects the outputs of all the layers (including the original normal prediction, and the extra outcome value y(i)) and computes the square-root of the regularized loss we have described above.  Some debug-logging of how the adaption is realized can be found [here](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/DebugNet.ipynb).
-  * We use [an adapter](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/YConditionalRegularizedModel.py) to allow sklearn style training via Keras/Tensorflow to train the above neural net as a regression (using square-residual loss) against an additional objective function that is identically zero.  The original informative true classification outcome is still part of the net input, though isolated from the standard portion of the net by the TrimmingLayer.  Only the outer regression is told the outcome is to be all zero.
+  * We use [an adapter](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/YConditionalRegularizedModel.py) to allow sklearn style training via Keras/Tensorflow to train the above neural net as a regression (using square-residual loss) against an additional objective function that is identically zero. The idea is: in the adapted network this layer is the regularized loss, which ideally is zero. The original informative true classification outcome is still part of the net input, though isolated from the standard portion of the net by the TrimmingLayer.  Only the outer regression is told the outcome is to be all zero.
   * After the training we copy the layer weights from the above exotic regression network into a standard network that can then be used to make actual predictions.
 
 The entirety of the above process is demonstrated in [SmoothedNet.ipynb](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/SmoothedNet.ipynb) .  This original example is adapted from [Jason Brownlee's "Binary Classification Tutorial with the Keras Deep Learning Library"](https://machinelearningmastery.com/binary-classification-tutorial-with-the-keras-deep-learning-library/), which we reproduce for clarity [here](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/BaseNet.ipynb).
@@ -46,11 +46,13 @@ The estimate out of sample performance of the y-conditional activation regulariz
 
 <img src="smoothed_out_perf.png">
 
-This had an accuracy of about 89%.
+This y-conditional regularized network had an accuracy of about 89%.
+
+The non-regularized version of the network had the following performance.
 
 <img src="unsmoothed_out_perf.png">
 
-This had an accuracy of about 84%.
+The non-regularized, or original, network had an accuracy of about 84%.
 
 We haven't seen a truly braggable improvement yet (evaluation is noisy, and our regularization introduces one more hyper-parameter), but we need to try this regularization on more data sets and deeper neural nets (where we think the effects will be more pronounced).
 
