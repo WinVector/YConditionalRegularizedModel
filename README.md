@@ -27,7 +27,7 @@ The advantage is: add rat(j) for intermediate j as additional terms for our obje
 
 where w(j) is just a normalization term such as w(j) := (d(j) - 1) / ((k - 1) sum_{a = 2,..,n-1; w(a) = w(j)}).  This normalization picked so each node in a layer has the same weight and the early layers, near the explanatory/input variables, get weaker regularization.  alpha is a hyper-parameter specifying the strength of the regularization.
 
-The overall idea: later layers in the neural net should have unsurprising values given the training outcome.  So we are adding a simple norm, one of many possible, to try and enforce that.  Or: to reduce over-fit try to minimize non-explanatory variation in the network activations.
+The overall idea: later layers in the neural net should have unsurprising values given the training outcome.  So we are adding a simple norm, one of many possible, to try and enforce that.  Or: to reduce over-fit try to minimize non-explanatory variation in the network activations.  Variations of the idea are to make values at each layer unsurprising given the values at the layer after it.
 
 In the project we demonstrate the effect on a simple data set using Keras and Tensorflow.  Now Keras doesn't natively supply a simple interface for regularizing activations on all layers.  Keras does have generic loss-functions and per-layer weight regularizers, but attempting to code this effect into those interfaces is going against their intent/design. So we use a couple of engineering tricks to get Keras to do the work for us.
 
