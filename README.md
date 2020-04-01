@@ -7,23 +7,23 @@ Suppose our training examples are indexed by i for i = 1,...,m and our neural ne
 
 Then we can generalize the empirical "match the outputs condition" to the following.  For node-j define the y-conditioned variance as:
 
-   mean(j, Y) := sum_{i = 1,...m; y(i) = Y} a(i, j) / sum_{i = 1,...m; y(i) = y} 1
-   var(j)     := sum_{i = 1,...m} (a(i, j) - mean(i, j, y(i)))^2 / m
-   cross(j)   := (mean(j, 0) - mean(j, 1))^2
-   rat(j)     := var(j) / cross(j) 
+     mean(j, Y) := sum_{i = 1,...m; y(i) = Y} a(i, j) / sum_{i = 1,...m; y(i) = y} 1
+     var(j)     := sum_{i = 1,...m} (a(i, j) - mean(i, j, y(i)))^2 / m
+     cross(j)   := (mean(j, 0) - mean(j, 1))^2
+     rat(j)     := var(j) / cross(j) 
 
 The intent is rat(j) should look a lot like a supervised version of the Calinski and Harabasz variance ratio criterion.  So small value of rat(j) means most of the variation in a(i, j) is associated with variation in y(i).
 
 The typical objective function for a binary classification problem is to minimize the following cross-entropy.
 
-   loss(i)    :=  - y(i) log(a(i, n)) - (1 - y(i)) log(1 - a(i, n))
-   total_loss := sum_{i = 1,...,m} loss(i)
+     loss(i)    :=  - y(i) log(a(i, n)) - (1 - y(i)) log(1 - a(i, n))
+     total_loss := sum_{i = 1,...,m} loss(i)
 
 Now minimizing loss(i) tends to also make var(n) small relative to cross(n).  This is because the loss tries to concentrate a(i, n) near 1 for all i such that y(i) is 1, and a(i, n) near 0 for all such that y(i) is 0.  For a perfect fit this would imply var(n) = 0 and cross(n) = 1.  So we can consider adding minimizing rat(n) as an additional auxiliary term to our loss/objective function.  Of course this doesn't yet add much, as total_loss is already a good objective function on the last-layer or prediction activations.
 
 The advantage is: add rat(j) for intermediate j as additional terms for our objective function.  Define our new regularized loss as:
 
-   regularized_loss := total_loss + alpha * sum_{j = 2,...,n-1} w(j) rat(j)
+     regularized_loss := total_loss + alpha * sum_{j = 2,...,n-1} w(j) rat(j)
 
 where w(j) is just a normalization term such as w(j) := (d(j) - 1) / ((k - 1) sum_{a = 2,..,n-1; w(a) = w(j)}).  This normalization picked so each node in a layer has the same weight and the early layers, near the explanatory/input variables, get weaker regularization.
 
