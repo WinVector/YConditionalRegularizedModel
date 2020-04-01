@@ -3,25 +3,25 @@ Win Vector LLC's Dr. Nina Zumel has had great success applying [y-aware methods]
 
 This is an example of regularizing a neural net by its activations (values seen at nodes), conditioned on outcome.
 
-The idea is: for a binary classification neural net we ideally have at the very last layer the prediction is 1 when the training outcome is 1 and the prediction is 0 when the training outcome is 0.  We can generalize this training criteria in such a way that it can be applied to interior layers of the neural net as follows.
+The idea is: for a binary classification neural net we ideally have at the very last layer the prediction is 1 when the training outcome is 1 and the prediction is 0 when the training outcome is 0.  Our improvement is to generalize this training criteria in such a way that it can be applied to interior layers of the neural net as follows.
 
-Suppose our training examples are indexed by i for i = 1,...,m and our neural net nodes are labeled by j = 1,...,n.  y(i) is the training outcome which we are assuming is 0/1. d(j) is the depth of the layer which ranges from 1 to k, 1 being the input layer (explanatory variables) and k being the output layer.  Define a(i, j) as the activation or value seen at node j (the value after the node's transfer and activation) for training example i.  Assume a(i, n) is the output or prediction layer of the neural net.  a(i, j) varies as the neural net weights are updated during training, we are looking at a(i, j) for a given value of the weights, and will need to re-compute a(i, j) after any training step or weight update.
+Suppose our training examples are indexed by i for i = 1,...,m and our neural net nodes are labeled by j = 1,...,n.  y(i) is the training outcome which we are assuming is 0/1. d(j) is the depth of the layer the j-th node is in, which ranges from 1 to k, 1 being the input layer (explanatory variables) and k being the output layer.  Define a(j, i) as the activation or value seen at node j (the value after the node's transfer and activation) for training example i.  Assume a(i, n) is the output or prediction layer of the neural net.  a(j, i) varies as the neural net weights are updated during training, we are looking at a(j, i) for a given value of the weights, and will need to re-compute a(j, i) after any training step or weight update.
 
 Then we can generalize the empirical "match the outputs condition" to the following.  For node-j define the y-conditioned variance as:
 
-     mean(j, Y) := sum_{i = 1,...m; y(i) = Y} a(i, j) / sum_{i = 1,...m; y(i) = y} 1
+     mean(j, Y) := sum_{i = 1,...m; y(i) = Y} a(j, i) / sum_{i = 1,...m; y(i) = Y} 1
      cross(j)   := (mean(j, 0) - mean(j, 1))^2
-     var(j, i)  := (a(i, j) - mean(i, j, y(i)))^2
+     var(j, i)  := (a(j, i) - mean(i, j, y(i)))^2
      rat(j, i)  := var(j) / cross(j) 
 
-The intent is rat(j, i) should look a lot like a supervised version of the Calinski and Harabasz variance ratio criterion.  So small value of rat(j, i) means most of the variation in a(i, j) is associated with variation in y(i). mean(j, Y) and cross(j) are many-example aggregates, for simplicity we will estimate them per-batch and thus prefer large batch sizes for better estimates.
+The intent is rat(j, i) should look a lot like a supervised version of the Calinski and Harabasz variance ratio criterion.  A small value of rat(j, i) means most of the variation in a(j, i) is associated with variation in y(i). mean(j, 0), mean(j, 1), and cross(j) are many-example aggregates, for simplicity we will estimate them per-batch and thus prefer large batch sizes for better estimates.
 
-The typical objective function for a binary classification problem is to minimize the following cross-entropy.
+A typical objective function for a binary classification problem is to minimize the following cross-entropy.
 
      loss(i)    :=  - y(i) log(a(i, n)) - (1 - y(i)) log(1 - a(i, n))
      total_loss := sum_{i = 1,...,m} loss(i)
 
-Now minimizing total_loss tends to also make var(n) small relative to cross(n).  This is because the loss tries to concentrate a(i, n) near 1 for all i such that y(i) is 1, and a(i, n) near 0 for all such that y(i) is 0.  For a perfect fit this would imply var(n) = 0 and cross(n) = 1.  So we can consider adding minimizing rat(n) as an additional auxiliary term to our loss/objective function.  Of course this doesn't yet add much, as total_loss is already a good objective function on the last-layer or prediction activations.
+Minimizing total_loss tends to also make var(n) small relative to cross(n).  This is because the loss tries to concentrate a(i, n) near 1 for all i such that y(i) is 1, and a(i, n) near 0 for all such that y(i) is 0.  For a perfect fit this would imply var(n) = 0 and cross(n) = 1.  So we can consider adding minimizing rat(n) as an additional auxiliary term to our loss/objective function.  Of course this doesn't yet add much, as total_loss is already a good objective function on the last-layer or prediction activations.
 
 Now we try something new that may have advantages: add rat(j, i) for intermediate j as additional terms for our objective function.  Define our new regularized loss as:
 
