@@ -40,7 +40,19 @@ In this project we demonstrate the effect on a simple data set using Keras and T
   * We use [an adapter](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/YConditionalRegularizedModel.py) to allow sklearn style training via Keras/Tensorflow to train the above neural net as a regression (using square-residual loss) against an additional objective function that is identically zero.  The original informative true classification outcome is still part of the net input, though isolated from the standard portion of the net by the TrimmingLayer.  Only the outer regression is told the outcome is to be all zero.
   * After the training we copy the layer weights from the above exotic regression network into a standard network that can then be used to make actual predictions.
 
-The entirety of the above process is demonstrated in [SmoothedNet.ipynb](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/SmoothedNet.ipynb) .  This original example is adapted from [Jason Brownlee's "Binary Classification Tutorial with the Keras Deep Learning Library"](https://machinelearningmastery.com/binary-classification-tutorial-with-the-keras-deep-learning-library/), which we reproduce for clarity [here](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/BaseNet.ipynb).  We haven't seen a defensible improvement yet, but we need to try this regularization on more data sets and deeper neural nets.
+The entirety of the above process is demonstrated in [SmoothedNet.ipynb](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/SmoothedNet.ipynb) .  This original example is adapted from [Jason Brownlee's "Binary Classification Tutorial with the Keras Deep Learning Library"](https://machinelearningmastery.com/binary-classification-tutorial-with-the-keras-deep-learning-library/), which we reproduce for clarity [here](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/BaseNet.ipynb).
+
+The estimate out of sample performance of the y-conditional activation regularized network is as graphed below.  We are showing the distribution of predictions condationed on actual outcome.
+
+<img src="smoothed_out_perf.png">
+
+This had an accuracy of about 89%.
+
+<img src="unsmoothed_out_perf.png">
+
+This had an accuracy of about 84%.
+
+We haven't seen a braggable improvement yet (evaluation is noisy, and our regularization introduces one more hyper-parameter), but we need to try this regularization on more data sets and deeper neural nets.
 
 
 
