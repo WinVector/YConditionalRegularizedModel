@@ -42,7 +42,7 @@ In this project we demonstrate the effect on a simple data set using Keras and T
 
 The entirety of the above process is demonstrated in [SmoothedNet.ipynb](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/SmoothedNet.ipynb) .  This original example is adapted from [Jason Brownlee's "Binary Classification Tutorial with the Keras Deep Learning Library"](https://machinelearningmastery.com/binary-classification-tutorial-with-the-keras-deep-learning-library/), which we reproduce for clarity [here](https://github.com/WinVector/YConditionalRegularizedModel/blob/master/BaseNet.ipynb).
 
-The estimate out of sample performance of the y-conditional activation regularized network is as graphed below.  We are showing the distribution of predictions condationed on actual outcome.
+The estimate out of sample performance of the y-conditional activation regularized network is as graphed below.  We are showing the distribution of predictions conditioned on actual outcome.
 
 <img src="smoothed_out_perf.png">
 
@@ -52,7 +52,7 @@ This had an accuracy of about 89%.
 
 This had an accuracy of about 84%.
 
-We haven't seen a braggable improvement yet (evaluation is noisy, and our regularization introduces one more hyper-parameter), but we need to try this regularization on more data sets and deeper neural nets.
+We haven't seen a braggable improvement yet (evaluation is noisy, and our regularization introduces one more hyper-parameter), but we need to try this regularization on more data sets and deeper neural nets (where we think the effects will be more pronounced).
 
 
 
